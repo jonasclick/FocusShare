@@ -9,23 +9,43 @@ import SwiftUI
 
 struct ContentView: View {
   @StateObject private var viewModel = FocusViewModel()
+  @State private var userIdToFollow: String = ""
   
   var body: some View {
     VStack {
-      Text("Focus State: \(viewModel.inFocus ? "Focused" : "Not Focused")")
+      Text("My User Name: \(viewModel.userId)")
+      
+      Spacer()
+      
+      Text("Currently: \(viewModel.inFocus ? "Focused" : "Not Focused")")
+        .padding()
       
       Button("Focus On") {
-        viewModel.updateFocusState(inFocus: true)
+        viewModel.listenToFocusUpdates()
+        viewModel.updateFocusStateToDb(inFocus: true)
       }
       .buttonStyle(BorderedProminentButtonStyle())
-      .padding()
       
       
       Button("Focus Off") {
-        viewModel.updateFocusState(inFocus: false)
+        viewModel.updateFocusStateToDb(inFocus: false)
       }
-      .padding()
       
+      
+      Spacer()
+      
+      Text("You're following: \(userIdToFollow)")
+      TextField("Enter user name to follow your friend.", text: $userIdToFollow)
+      Button("Follow now") {
+        viewModel.followUser(followingId: userIdToFollow)
+      }
+      .buttonStyle(BorderedButtonStyle())
+      Button("Stop Following") {
+        viewModel.stopFollowing()
+        userIdToFollow = ""
+      }
+      
+      Spacer()
       
     }
     .padding()
