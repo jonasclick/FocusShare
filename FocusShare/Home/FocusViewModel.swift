@@ -78,6 +78,7 @@ class FocusViewModel: ObservableObject {
         if let data = snapshot?.data(), let focusState = data["inFocus"] as? Bool {
           DispatchQueue.main.async {
             self.inFocus = focusState
+            print("DEBUG: Received new focus state from db: \(focusState)")
           }
         }
       }
