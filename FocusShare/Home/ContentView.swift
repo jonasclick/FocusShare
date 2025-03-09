@@ -44,7 +44,8 @@ struct ContentView: View {
             Group {
               if viewModel.isFollowMode {
                 Text("Following ") +
-                Text(viewModel.followingUserId ?? "").bold()
+                Text(viewModel.followingUserId ?? "")
+                  .fontWeight(.bold)
               } else {
                 TextField("Search to follow someone", text: $userIdToFollow)
               }
