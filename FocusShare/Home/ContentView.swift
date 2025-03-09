@@ -15,23 +15,19 @@ struct ContentView: View {
   var body: some View {
     
     VStack {
-      // Upper Screen Half (Focus Indicator)
+      // MARK: Upper Screen Half (Focus Indicator)
+      
       if !viewModel.isFollowMode {
-        
-        // TODO: This if condition should be moved into the FocusView()
-        if viewModel.inFocus {
-          FocusOnView()
-            .environmentObject(viewModel)
-        } else {
-          FocusOffView()
-            .environmentObject(viewModel)
-        }
+        // Not following a user (default)
+        FocusView()
+          .environmentObject(viewModel)
       } else {
+        // Following a user
         FollowView()
           .environmentObject(viewModel)
       }
       
-      // Lower Screen Half (Follow-Menu)
+      // MARK: Lower Screen Half (Follow-Menu)
       Spacer()
       
       VStack {
