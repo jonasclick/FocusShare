@@ -41,16 +41,30 @@ struct ContentView: View {
             .shadow(color: .black.opacity(0.15), radius: 15, x: 0, y: 5)
           
           HStack {
-            TextField("Search to follow someone", text: $userIdToFollow)
-              .font(.system(size: 16))
-              .fontWeight(.light)
-              .foregroundStyle(.black.opacity(0.5))
-              .padding(.leading, 22)
+            Group {
+              if viewModel.isFollowMode {
+                Text("Following ") +
+                Text(viewModel.followingUserId ?? "").bold()
+              } else {
+                TextField("Search to follow someone", text: $userIdToFollow)
+              }
+            }
+            .font(.system(size: 16))
+            .fontWeight(.light)
+            .foregroundStyle(.black.opacity(0.5))
+            .padding(.leading, 22)
+            
             Spacer()
+            
             Button {
-              viewModel.followUser(followingId: userIdToFollow)
+              if viewModel.isFollowMode {
+                viewModel.stopFollowing()
+              } else {
+                viewModel.followUser(followingId: userIdToFollow)
+                userIdToFollow = ""
+              }
             } label: {
-              Text("Follow")
+              Text(viewModel.isFollowMode ? "Unfollow" : "Follow")
                 .font(.system(size: 16))
                 .fontWeight(.semibold)
                 .foregroundStyle(.black)
