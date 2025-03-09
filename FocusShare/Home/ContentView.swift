@@ -77,10 +77,12 @@ struct ContentView: View {
         
         // Username information
         VStack {
-          HStack (spacing: 3) {
-            Text("Your username is")
-              .fontWeight(.light)
+          Group {
+            Text("Your username is ")
+              .fontWeight(.light) +
             Text(viewModel.userId)
+              .fontWeight(.bold) +
+            Text(".")
               .fontWeight(.bold)
           }
           .padding(.top, 10)
