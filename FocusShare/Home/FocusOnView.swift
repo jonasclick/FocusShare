@@ -9,8 +9,8 @@ import SwiftUI
 
 struct FocusOnView: View {
   
-  @StateObject private var viewModel = FocusViewModel()
-  
+  @EnvironmentObject var viewModel: FocusViewModel
+
     var body: some View {
       ZStack {
         
@@ -41,7 +41,7 @@ struct FocusOnView: View {
           
           Text("We asked your followers not to interrupt you.")
             .font(.system(size: 16))
-            .fontWeight(.regular)
+            .fontWeight(.light)
             .foregroundStyle(.white.opacity(0.8))
             .padding(.top, 55)
           

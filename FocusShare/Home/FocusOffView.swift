@@ -9,7 +9,7 @@ import SwiftUI
 
 struct FocusOffView: View {
   
-  @StateObject private var viewModel = FocusViewModel()
+  @EnvironmentObject var viewModel: FocusViewModel
   
   var body: some View {
     
@@ -44,7 +44,7 @@ struct FocusOffView: View {
         
         Text("Your followers may interrupt you.")
           .font(.system(size: 16))
-          .fontWeight(.regular)
+          .fontWeight(.light)
           .foregroundStyle(.white.opacity(0.8))
           .padding(.top, 55)
         

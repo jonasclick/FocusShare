@@ -10,6 +10,7 @@ import FirebaseFirestore
 
 class FocusViewModel: ObservableObject {
   @Published var inFocus: Bool = false
+  @Published var isFollowMode: Bool = false
   @Published var followingUserId: String? = nil
   private var db = Firestore.firestore()
   private var listener: ListenerRegistration?
@@ -78,7 +79,6 @@ class FocusViewModel: ObservableObject {
         if let data = snapshot?.data(), let focusState = data["inFocus"] as? Bool {
           DispatchQueue.main.async {
             self.inFocus = focusState
-            print("DEBUG: Received new focus state from db: \(focusState)")
           }
         }
       }
@@ -97,6 +97,7 @@ class FocusViewModel: ObservableObject {
           }
         }
       }
+    self.isFollowMode = true
   }
   
   
@@ -123,6 +124,7 @@ class FocusViewModel: ObservableObject {
     listener?.remove()
     print("DEBUG: Stopped following user \(followingUserId ?? "unknown").")
     followingUserId = nil
+    isFollowMode = false
   }
   
   
