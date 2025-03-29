@@ -87,6 +87,10 @@ class FocusViewModel: ObservableObject {
   
   /// Follow focus state of another user
   func followUser(followingId: String) {
+    // If user doesn't specify a username, return.
+    guard followingId.trimmingCharacters(in: .whitespacesAndNewlines) != "" else {
+      return
+    }
     self.followingUserId = followingId
     listener?.remove()
     listener = db.collection("users").document(followingId)
