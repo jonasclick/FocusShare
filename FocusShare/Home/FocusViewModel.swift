@@ -12,20 +12,22 @@ class FocusViewModel: ObservableObject {
   @Published var inFocus: Bool = false
   @Published var isFollowMode: Bool = false
   @Published var followingUserId: String? = nil
+  @Published var isUserIdReady: Bool = false
   private var db = Firestore.firestore()
   private var listener: ListenerRegistration?
   private let userIdKey = "focusShareUserId"
   
   var userId: String
   
+  
+  
   init() {
-    // check if a User ID already exists
     if let savedUserId = UserDefaults.standard.string(forKey: userIdKey) {
       self.userId = savedUserId
+      self.isUserIdReady = true
       print("DEBUG: Found existing UserId in UserDefaults: \(savedUserId)")
     } else {
-      // generate a fresh User ID if needed
-      self.userId = "" // initialize as empty string, will be set later
+      self.userId = ""
       generateUniqueUserId()
     }
   }
@@ -38,12 +40,13 @@ class FocusViewModel: ObservableObject {
     db.collection("users").document(newUserId).getDocument { snapshot, error in
       if let snapshot = snapshot, snapshot.exists {
         print("DEBUG: Re-Generating User ID, as \(newUserId) already exists.")
-        self.generateUniqueUserId() // re-run if the user id is already taken
+        self.generateUniqueUserId()
       } else {
         print("DEBUG: Generated User ID \(newUserId), which is unique.")
         UserDefaults.standard.set(newUserId, forKey: self.userIdKey)
         self.userId = newUserId
-        self.saveUserIdToFirestore() // Save user id to firestore
+        self.saveUserIdToFirestore()
+        self.isUserIdReady = true
       }
     }
   }
@@ -105,21 +108,23 @@ class FocusViewModel: ObservableObject {
   }
   
   
-  /// Save user's own focus state to db
+  /// Save / update user's own focus state to db
   func updateFocusStateToDb(inFocus: Bool) {
     guard followingUserId == nil else {
       print("DEBUG: You cannot start a focus while following another user.")
       return
     }
     
-    db.collection("users").document(userId).setData(
-      ["inFocus": inFocus], merge: true) { error in
-        if let error = error {
-          print("DEBUG: Could not save focus state to db: \(error.localizedDescription)")
-        } else {
-          print("DEBUG: Focus state updated to db for \(self.userId): \(inFocus)")
-        }
+    db.collection("users").document(userId).setData([
+      "inFocus": inFocus,
+      "lastUpdate": Date()
+    ], merge: true) { error in
+      if let error = error {
+        print("DEBUG: Could not save focus state to db: \(error.localizedDescription)")
+      } else {
+        print("DEBUG: Focus state updated to db for \(self.userId): \(inFocus)")
       }
+    }
   }
   
   
