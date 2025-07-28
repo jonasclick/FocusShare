@@ -15,7 +15,7 @@ struct FocusView: View {
     
     if viewModel.inFocus {
       
-      // MARK: Currently Focussed
+      // MARK: CASE: Currently Focussed
       ZStack {
         
         // Background Image
@@ -52,12 +52,13 @@ struct FocusView: View {
         }
       }
       .onTapGesture {
+        // Turn off my focus
         viewModel.updateFocusStateToDb(inFocus: false)
       }
       
     } else {
       
-      //MARK: Currently NOT focussed
+      //MARK: CASE: Currently NOT focussed
       ZStack {
         
         // Background Image
@@ -96,6 +97,7 @@ struct FocusView: View {
         }
       }
       .onTapGesture {
+        // Turn on my focus
         viewModel.listenToFocusUpdates()
         viewModel.updateFocusStateToDb(inFocus: true)
       }

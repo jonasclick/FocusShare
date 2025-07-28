@@ -22,30 +22,49 @@ class FocusViewModel: ObservableObject {
   
   
   init() {
+    // If not first startup: Retrieve user id from UserDefaults
     if let savedUserId = UserDefaults.standard.string(forKey: userIdKey) {
       self.userId = savedUserId
       self.isUserIdReady = true
       print("DEBUG: Found existing UserId in UserDefaults: \(savedUserId)")
     } else {
+      // On first startup: Create a user ID.
       self.userId = ""
       generateUniqueUserId()
     }
   }
   
   
-  /// Generate a **unique** User ID (meaningful word + number)
+  /// Generate a unique User ID (meaningful word + number) - to be run only on first startup
   private func generateUniqueUserId() {
+    
+    // Generate a user ID string
     let newUserId = FocusViewModel.generateRandomUserId()
     
+    // Check in DB if this ID already exists
     db.collection("users").document(newUserId).getDocument { snapshot, error in
       if let snapshot = snapshot, snapshot.exists {
+        
+        // CASE: ID exists already
         print("DEBUG: Re-Generating User ID, as \(newUserId) already exists.")
+        
+        // restart this function
         self.generateUniqueUserId()
       } else {
+        
+        // CASE: ID is unique and not used by any other user yet.
         print("DEBUG: Generated User ID \(newUserId), which is unique.")
+        
+        // Save ID in UserDefaults to make it persistent between app launches
         UserDefaults.standard.set(newUserId, forKey: self.userIdKey)
+        
+        // Pass ID to the ViewModel
         self.userId = newUserId
+        
+        // Create this new user in the Firestore DB
         self.saveUserIdToFirestore()
+        
+        // Tell the UI to render the User ID
         self.isUserIdReady = true
       }
     }
@@ -67,20 +86,25 @@ class FocusViewModel: ObservableObject {
   }
   
   
-  /// Generate a random ID from a word + number (example: Squirrel23)
+  /// Generate a random ID from a word + number (example: Mouse23)
   private static func generateRandomUserId() -> String {
+    // Collection of Animals
     let words = ["Squirrel", "Fox", "Rabbit", "Owl", "Mouse", "Bear", "Horse", "Turtle", "Parrot", "Sheep"]
-    let randomWord = words.randomElement() ?? "User"
+    let randomWord = words.randomElement() ?? "User" // with Fallback
     let randomNumber = Int.random(in: 10...99)
-    return "\(randomWord)\(randomNumber)" // example: Squirrel23
+    return "\(randomWord)\(randomNumber)" // Example: Mouse23
   }
   
-  /// Listen to own focus updates
+  /// IS THIS ONLY TO LISTEN TO MY OWN UPDATES? DON'T UNDERSTAND YET......
+  /// Listener to get focus updates of another user: Used when following another user
   func listenToFocusUpdates() {
+    // Start a listener onto the DB
     listener = db.collection("users").document(userId)
       .addSnapshotListener { snapshot, error in
         if let data = snapshot?.data(), let focusState = data["inFocus"] as? Bool {
           DispatchQueue.main.async {
+            /// Focus of another user uses same inFocus var. However, when listening to another
+            /// User, we will have isFollowMode = true in order to display it in the UI correctly.
             self.inFocus = focusState
           }
         }
@@ -90,12 +114,14 @@ class FocusViewModel: ObservableObject {
   
   /// Follow focus state of another user
   func followUser(followingId: String) {
-    // If user doesn't specify a username, return.
+    // If user didn't specify a username, return. Since we can't listen to noone.
     guard followingId.trimmingCharacters(in: .whitespacesAndNewlines) != "" else {
       return
     }
     self.followingUserId = followingId
+    // Safeguard: Stop old listener, in case it's still existing.
     listener?.remove()
+    
     listener = db.collection("users").document(followingId)
       .addSnapshotListener { snapshot, error in
         if let data = snapshot?.data(), let focusState = data["inFocus"] as? Bool {

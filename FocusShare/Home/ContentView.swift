@@ -11,11 +11,17 @@ struct ContentView: View {
   
   @StateObject var viewModel = FocusViewModel()
   @State private var userIdToFollow: String = ""
+  @State private var isSettingsPresented: Bool = false
   @FocusState private var isSearchFocused: Bool
+  
   
   var body: some View {
     
     Group {
+      
+      
+      // MARK: Main Screen UI
+      
       // On first startup, wait for username to be generated.
       if viewModel.isUserIdReady {
         
@@ -34,34 +40,51 @@ struct ContentView: View {
             }
             
             // MARK: Lower Screen Half (Follow-Menu)
-            Spacer()
             
+            Spacer()
             VStack {
-              
-              
-              // Username information
+              // Inform User about their own Username
               VStack {
-                Group {
-                  Text("Your username is ")
-                    .fontWeight(.light) +
-                  Text(viewModel.userId)
-                    .fontWeight(.bold) +
-                  Text(".")
-                    .fontWeight(.bold)
+                HStack (spacing: 0) {
+                  Text("Your username is ").fontWeight(.light)
+                  Text("\(viewModel.userId).").bold()
                 }
-                .padding(.top, 40)
+                .padding(.top, 125)
                 .font(.system(size: 14))
                 
-                Text("Only give out your username to people you trust.")
+                // Privacy Remark
+                HStack {
+                  Image(systemName: "person.badge.shield.exclamationmark")
+                    .padding(.top, 10)
+                    .padding(.trailing, 10)
+                    .font(.system(size: 22))
+                  VStack (alignment: .leading) {
+                    Text("Your username lets others follow your focus.")
+                    Text("Share it only with people you trust.")
+                  }
                   .fontWeight(.light)
                   .padding(.top, 5)
                   .font(.system(size: 12))
-                
+                }
+                .padding(.top, 15)
               }
               .opacity(0.54)
             }
             
             Spacer()
+           
+            // Settings Button
+            HStack {
+              Spacer()
+              Image(systemName: "switch.2")
+                .font(.system(size: 20))
+                .padding(.bottom, 35)
+                .padding(.trailing, 35)
+                .opacity(0.54)
+                .onTapGesture {
+                  isSettingsPresented.toggle()
+                }
+            }
           }
           
           // White background between the search bar and the rest of the view
@@ -84,8 +107,7 @@ struct ContentView: View {
               Group {
                 if viewModel.isFollowMode {
                   Text("Following ") +
-                  Text(viewModel.followingUserId ?? "")
-                    .fontWeight(.bold)
+                  Text(viewModel.followingUserId ?? "").bold()
                 } else {
                   TextField("Search to follow someone", text: $userIdToFollow)
                     .focused($isSearchFocused)
@@ -122,12 +144,15 @@ struct ContentView: View {
           
         }
         .ignoresSafeArea()
+        .sheet(isPresented: $isSettingsPresented) {
+          SettingsView()
+            .presentationDetents([.fraction(0.22)])
+        }
         
       } else {
         Text("Loading...")
       }
     }
-    
   }
 }
 
