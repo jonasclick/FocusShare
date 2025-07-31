@@ -10,27 +10,12 @@
 		DDCF25082D5B9B8B009C804F /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = DDCF25072D5B9B8B009C804F /* FirebaseFirestore */; };
 /* End PBXBuildFile section */
 
-/* Begin PBXCopyFilesBuildPhase section */
-		DDA375882DD66D02005E49CD /* Embed Foundation Extensions */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 13;
-			files = (
-			);
-			name = "Embed Foundation Extensions";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
-
 /* Begin PBXFileReference section */
 		DD7FC0132D5B996C00545881 /* FocusShare.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FocusShare.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		DDA375772DD66D01005E49CD /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
-		DDA375792DD66D01005E49CD /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		DDA3758D2DD66D98005E49CD /* Exceptions for "FocusShare" folder in "FocusShare" target */ = {
+		DDE4E4AA2DC915B9006357DA /* Exceptions for "FocusShare" folder in "FocusShare" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -43,7 +28,7 @@
 		DD7FC0152D5B996C00545881 /* FocusShare */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				DDA3758D2DD66D98005E49CD /* Exceptions for "FocusShare" folder in "FocusShare" target */,
+				DDE4E4AA2DC915B9006357DA /* Exceptions for "FocusShare" folder in "FocusShare" target */,
 			);
 			path = FocusShare;
 			sourceTree = "<group>";
@@ -66,7 +51,6 @@
 			isa = PBXGroup;
 			children = (
 				DD7FC0152D5B996C00545881 /* FocusShare */,
-				DDA375762DD66D01005E49CD /* Frameworks */,
 				DD7FC0142D5B996C00545881 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -79,15 +63,6 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		DDA375762DD66D01005E49CD /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				DDA375772DD66D01005E49CD /* WidgetKit.framework */,
-				DDA375792DD66D01005E49CD /* SwiftUI.framework */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -98,7 +73,6 @@
 				DD7FC00F2D5B996C00545881 /* Sources */,
 				DD7FC0102D5B996C00545881 /* Frameworks */,
 				DD7FC0112D5B996C00545881 /* Resources */,
-				DDA375882DD66D02005E49CD /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
@@ -122,7 +96,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1630;
+				LastSwiftUpdateCheck = 1620;
 				LastUpgradeCheck = 1630;
 				TargetAttributes = {
 					DD7FC0122D5B996C00545881 = {
@@ -306,7 +280,6 @@
 				DEVELOPMENT_ASSET_PATHS = "\"FocusShare/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = FocusShare;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -336,7 +309,6 @@
 				DEVELOPMENT_ASSET_PATHS = "\"FocusShare/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = FocusShare;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

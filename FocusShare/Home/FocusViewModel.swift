@@ -9,23 +9,22 @@ import Foundation
 import FirebaseFirestore
 
 class FocusViewModel: ObservableObject {
+  @Published var userId: String
   @Published var inFocus: Bool = false
-  @Published var isFollowMode: Bool = false
   @Published var followingUserId: String? = nil
-  @Published var isUserIdReady: Bool = false
+  @Published var isFollowMode: Bool = false
+  @Published var firestoreError: String? = nil
+  
   private var db = Firestore.firestore()
   private var listener: ListenerRegistration?
   private let userIdKey = "focusShareUserId"
-  
-  var userId: String
-  
-  
+  private var syncStatusListener: ListenerRegistration?
+  private var pendingWriteDelayWorkItem: DispatchWorkItem?
   
   init() {
     // If not first startup: Retrieve user id from UserDefaults
     if let savedUserId = UserDefaults.standard.string(forKey: userIdKey) {
       self.userId = savedUserId
-      self.isUserIdReady = true
       print("DEBUG: Found existing UserId in UserDefaults: \(savedUserId)")
     } else {
       // On first startup: Create a user ID.
@@ -33,7 +32,6 @@ class FocusViewModel: ObservableObject {
       generateUniqueUserId()
     }
   }
-  
   
   /// Generate a unique User ID (meaningful word + number) - to be run only on first startup
   private func generateUniqueUserId() {
@@ -63,9 +61,6 @@ class FocusViewModel: ObservableObject {
         
         // Create this new user in the Firestore DB
         self.saveUserIdToFirestore()
-        
-        // Tell the UI to render the User ID
-        self.isUserIdReady = true
       }
     }
   }
@@ -95,16 +90,13 @@ class FocusViewModel: ObservableObject {
     return "\(randomWord)\(randomNumber)" // Example: Mouse23
   }
   
-  /// IS THIS ONLY TO LISTEN TO MY OWN UPDATES? DON'T UNDERSTAND YET......
-  /// Listener to get focus updates of another user: Used when following another user
+  // Listener to get focus updates (for when own focus changes to not in focus
   func listenToFocusUpdates() {
     // Start a listener onto the DB
     listener = db.collection("users").document(userId)
       .addSnapshotListener { snapshot, error in
         if let data = snapshot?.data(), let focusState = data["inFocus"] as? Bool {
           DispatchQueue.main.async {
-            /// Focus of another user uses same inFocus var. However, when listening to another
-            /// User, we will have isFollowMode = true in order to display it in the UI correctly.
             self.inFocus = focusState
           }
         }
@@ -141,17 +133,19 @@ class FocusViewModel: ObservableObject {
       return
     }
     
-    db.collection("users").document(userId).setData([
-      "inFocus": inFocus,
-      "lastUpdate": Date()
-    ], merge: true) { error in
+    db.collection("users").document(userId).setData(["inFocus": inFocus], merge: true) { error in
       if let error = error {
         print("DEBUG: Could not save focus state to db: \(error.localizedDescription)")
       } else {
-        print("DEBUG: Focus state updated to db for \(self.userId): \(inFocus)")
+        print("DEBUG: Focus state updated locally for \(self.userId): \(inFocus)")
+        // Start monitoring to see if the update gets synched to DB
+        // this is done in order to detect if device has no network connection
+        self.monitorSyncStatus()
+        
       }
     }
   }
+  
   
   
   /// Stop following another user
@@ -163,7 +157,48 @@ class FocusViewModel: ObservableObject {
   }
   
   
+  // Handle no internet connection (Firestore can store pending writes,
+  // but this is to inform the user that his update hasn't been written.
+  // In order to not let the error pop up quickly after every focus change,
+  // checking the internet connection gets scheduled / delayed 1 second.
+  private func monitorSyncStatus() {
+    syncStatusListener?.remove()
+    
+    syncStatusListener = db.collection("users").document(userId)
+      .addSnapshotListener { snapshot, error in
+        guard snapshot != nil else { return }
+        
+        // Cancel any previous scheduled checks
+        self.pendingWriteDelayWorkItem?.cancel()
+        
+        if snapshot!.metadata.hasPendingWrites {
+          let workItem = DispatchWorkItem {
+            self.db.collection("users").document(self.userId).getDocument { freshSnapshot, _ in
+              DispatchQueue.main.async {
+                if freshSnapshot?.metadata.hasPendingWrites == true {
+                  print("DEBUG: Focus update pending. Waiting for network connection...")
+                  self.firestoreError = "Focus update pending. Waiting for network connection..."
+                } else {
+                  print("DEBUG: Sync completed before showing error. Skipping error display.")
+                  self.firestoreError = nil
+                }
+              }
+            }
+          }
+          
+          self.pendingWriteDelayWorkItem = workItem
+          DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: workItem)
+        } else {
+          self.firestoreError = nil
+        }
+      }
+  }
+  
+  
+  
   deinit {
     listener?.remove() // remove listener when ViewModel unloads from memory
+    syncStatusListener?.remove()
+    pendingWriteDelayWorkItem?.cancel()
   }
 }
