@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
   
+  @Environment(\.colorScheme) private var colorScheme
   @StateObject var viewModel = FocusViewModel()
   @State private var userIdToFollow: String = ""
   @State private var isSettingsPresented: Bool = false
@@ -87,10 +88,10 @@ struct ContentView: View {
         ZStack {
           // Search bar to follow someone, moves up when focussed
           Rectangle()
-            .foregroundStyle(.white)
+            .foregroundStyle(Color(UIColor.systemBackground))
             .frame(width: 339, height: 50)
             .cornerRadius(42)
-            .shadow(color: .black.opacity(0.15), radius: 15, x: 0, y: 5)
+            .shadow(color: Color.primary.opacity(colorScheme == .light ? 0.15 : 0.25), radius: 15, x: 0, y: 5)
           
           HStack {
             // Username Entry Field / userIdToFollow Display Field
@@ -105,7 +106,7 @@ struct ContentView: View {
             }
             .font(.system(size: 16))
             .fontWeight(.light)
-            .foregroundStyle(.black.opacity(0.5))
+            .foregroundStyle(Color.primary.opacity(0.5))
             .padding(.leading, 23)
             
             Spacer()
@@ -123,7 +124,7 @@ struct ContentView: View {
               Text(viewModel.isFollowMode ? "Unfollow" : "Follow")
                 .font(.system(size: 16))
                 .fontWeight(.semibold)
-                .foregroundStyle(.black)
+                .foregroundStyle(colorScheme == .light ? Color.primary : Color.primary.opacity(0.7))
                 .padding(.trailing, 18)
             }
           }

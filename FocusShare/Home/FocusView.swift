@@ -30,7 +30,7 @@ struct FocusView: View {
         // MARK: Circle with Focus Symbol
         ZStack {
           Circle()
-            .foregroundStyle(.white)
+            .foregroundStyle(Color(UIColor.systemBackground))
             .frame(width: 103)
             .shadow(color: .black.opacity(0.7), radius: 15, x: 12, y: 12)
           

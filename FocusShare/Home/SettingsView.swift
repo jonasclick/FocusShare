@@ -9,6 +9,7 @@ import SwiftUI
 struct SettingsView: View {
   
   @Environment(\.dismiss) private var dismiss
+  @Environment(\.colorScheme) private var colorScheme
   @State private var isGitHubPresented = false
   
   var body: some View {
@@ -34,9 +35,9 @@ struct SettingsView: View {
             // Background
             Rectangle()
               .clipShape(RoundedRectangle(cornerRadius: 16))
-              .foregroundStyle(.white)
-              .shadow(color: .black.opacity(0.15), radius: 15, x: 0, y: 5)
-            
+              .foregroundStyle(Color(UIColor.systemBackground))
+              .shadow(color: Color.primary.opacity(colorScheme == .light ? 0.15 : 0.1), radius: 15, x: 0, y: 5)
+
             // Icon and Text
             HStack {
               Image(systemName: "lightbulb.max")
@@ -59,10 +60,10 @@ struct SettingsView: View {
           ZStack {
             Rectangle()
               .clipShape(RoundedRectangle(cornerRadius: 16))
-              .foregroundStyle(.white)
-              .shadow(color: .black.opacity(0.15), radius: 15, x: 0, y: 5)
+              .foregroundStyle(Color(UIColor.systemBackground))
+              .shadow(color: Color.primary.opacity(colorScheme == .light ? 0.15 : 0.1), radius: 15, x: 0, y: 5)
             HStack {
-              Image("github logo")
+              Image(colorScheme == .light ? "github logo" : "github logo inverted")
                 .resizable()
                 .frame(width: 18, height: 18)
                 .padding(.leading, -2)
